@@ -50,6 +50,44 @@ class PlantByID(Resource):
 
 api.add_resource(PlantByID, '/plants/<int:id>')
 
+class UpdatePlant(Resource):
+
+    def patch(self, id):
+        # Fetch the plant from the database
+        plant = Plant.query.get_or_404(id)
+
+        # Get the data from the request body
+        data = request.json
+
+        # Update the plant attributes
+        if 'is_in_stock' in data:
+            plant.is_in_stock = data['is_in_stock']
+
+        # Commit the changes to the database
+        db.session.commit()
+
+        # Return the updated plant as JSON
+        return make_response(plant.to_dict(), 200)
+
+
+api.add_resource(UpdatePlant, '/plants/<int:id>')
+
+class DeletePlant(Resource):
+
+    def delete(self, id):
+        # Fetch the plant from the database
+        plant = Plant.query.get_or_404(id)
+
+        # Delete the plant
+        db.session.delete(plant)
+        db.session.commit()
+
+        # Return no content
+        return make_response('', 204)
+
+
+api.add_resource(DeletePlant, '/plants/<int:id>')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
